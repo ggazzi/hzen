@@ -34,4 +34,4 @@ executable dzenbar
                      , timers ==0.2.*
                      , suspend ==0.2.*
   ghc-options: -threaded
-  other-extensions:    TypeFamilies, TupleSections
+  other-extensions:    TypeFamilies, TupleSections, Rank2Types

@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
-{-# OPTIONS_GHC -fno-warn-name-shadowing -fwarn-hi-shadowing #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 module Reactive.Banana.Monitors.Cpu
        ( CpuMonitor
        , busy

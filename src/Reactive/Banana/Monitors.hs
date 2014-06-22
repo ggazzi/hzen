@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeFamilies #-}
 module Reactive.Banana.Monitors
        ( module Reactive.Banana.Monitors.Class
        ) where
