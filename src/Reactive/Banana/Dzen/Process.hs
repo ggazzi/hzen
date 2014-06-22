@@ -8,6 +8,9 @@ module Reactive.Banana.Dzen.Process
 import Control.Concurrent.Suspend (Delay, msDelay)
 import Control.Concurrent.Timer (repeatedTimer, stopTimer)
 
+import Data.Colour
+import Data.Colour.SRGB
+
 import System.Exit (exitWith)
 import System.IO
 import System.Process
@@ -23,17 +26,25 @@ import qualified Reactive.Banana.Monitors.Tick as T
 import Reactive.Banana.Dzen.Widget (Widget(..), runWidget)
 
 -- | Configuration for the dzen process, including its executable
---   and the frequency with which it should be updated.
+-- and the frequency with which it should be updated.
+--
+-- Some of the command-line arguments passed to dzen are explicitly
+-- represented in 'DzenConf'. Those are appended to the end of 'dzenArgs'
+-- when creating the process.
 data DzenConf = DzenConf
   { dzenPath :: FilePath
   , dzenArgs :: [String]
+  , fgColor  :: Maybe (Colour Double)
+  , bgColor  :: Maybe (Colour Double)
   , updateFreq :: Delay }
 
 -- | A default configuration
 defaultConf :: DzenConf
 defaultConf = DzenConf { dzenPath = "dzen2"
                        , dzenArgs = []
-                       , updateFreq = msDelay 500 }
+                       , updateFreq = msDelay 500
+                       , fgColor = Nothing
+                       , bgColor = Nothing }
 
 -- | Run the main loop for the dzen bar.
 --
@@ -73,7 +84,17 @@ runDzen conf monitors mWidget = do
 -- | Creates a process for dzen and return its standard input 'Handle'.
 createDzen :: DzenConf -> IO (Handle, ProcessHandle)
 createDzen conf = do
-    let dzen = proc (dzenPath conf) (dzenArgs conf)
+    let args = makeArgs conf
+        dzen = proc (dzenPath conf) args
+    putStrLn . unwords . (dzenPath conf:) $ args
     (Just inHandle, _, _, pHandle) <- createProcess $ dzen { std_in = CreatePipe }
     hSetBuffering inHandle LineBuffering
     return (inHandle, pHandle)
+
+makeArgs :: DzenConf -> [String]
+makeArgs conf = dzenArgs conf ++
+                makeArg (\c -> ["-fg", sRGB24show c]) (fgColor conf) ++
+                makeArg (\c -> ["-bg", sRGB24show c]) (bgColor conf)
+
+makeArg :: (a -> [String]) -> Maybe a -> [String]
+makeArg = maybe []
