@@ -9,14 +9,14 @@ import Reactive.Banana
 import Reactive.Banana.Frameworks hiding (newEvent)
 
 
--- | A monitor of the system, providing one or more 'Signal's/'Behavior's.
+-- | A monitor of the system, providing one or more 'Event's and 'Behavior's.
 --
 -- Each instance of this class should group information about some part of
 -- the system, which are always collected together.
 class Monitor m where
   -- | Contains the necessary information in order for reactive-banana to
-  -- create the necessary 'Signal's and 'Behavior's, and also the actions
-  -- used for firing such 'Signal's and updating the 'Behavior's.
+  -- create the necessary 'Event's and 'Behavior's, and also the actions
+  -- used for firing such 'Event's and updating the 'Behavior's.
   data SourceOf m :: *
 
   -- | Given the source of a monitor, create it.

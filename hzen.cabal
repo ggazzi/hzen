@@ -1,0 +1,72 @@
+name:                hzen
+version:             0.1.0
+synopsis:            A functional reactive approach to dzen status bars.
+description:         This package provides utilities for implementing dzen-based
+                     status bars in a functional reactive style. The major
+                     components of this are Monitors and Widgets. There is a
+                     heavy dependency on the reactive-banana package, and a lot
+                     of inspiration was drawn from the xmobar and dzen-utils
+                     packages.
+                     .
+                     In order for a user to pick several aspects of the system
+                     that will be displayed in the status bar, the notion of
+                     Monitor was introduced. A Monitor is essentially the source
+                     of Behaviors and/or Events, providing also an
+                     initialization action and a polling action. The obtaining
+                     of system information is thus encapsulated with little
+                     loss of composability.
+                     .
+                     In order to define the dzen output in a convenient and
+                     type-safe way, Widgets are provided. They may be though
+                     of as Behaviors of String, that is, time-varying dzen
+                     command strings. A little more machinery is defined,
+                     though, to enhance the composability.
+license:             MIT
+license-file:        LICENSE
+author:              Guilherme G. Azzi
+maintainer:          ggazzi@inf.ufrgs.br
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src/
+  exposed-modules:     Reactive.Banana.Dzen
+                     , Reactive.Banana.Dzen.Color
+                     , Reactive.Banana.Monitors
+                     , Reactive.Banana.Monitors.Cpu
+                     , Reactive.Banana.Monitors.Tick
+                     , Reactive.Banana.Sources
+  other-modules:       Reactive.Banana.Dzen.Process
+                     , Reactive.Banana.Dzen.Widget
+                     , Reactive.Banana.Monitors.Class
+  default-language:    Haskell2010
+  build-depends:       base >=4.6 && <4.8
+                     , bytestring >=0.10 && <0.11
+                     , colour ==2.*
+                     , mtl ==2.*
+                     , process ==1.*
+                     , reactive-banana ==0.8.*
+                     , timers ==0.2.*
+                     , transformers ==0.3.*
+                     , suspend ==0.2.*
+  ghc-options:         -threaded
+  other-extensions:    GeneralizedNewtypeDeriving
+                     , Rank2Types
+                     , TupleSections
+                     , TypeFamilies
+
+executable dzenbar
+  main-is:             simple.hs
+  hs-source-dirs:      src/ examples/
+  default-language:    Haskell2010
+  build-depends:       base >=4.6 && <4.8
+                     , bytestring >=0.10 && <0.11
+                     , colour ==2.*
+                     , mtl ==2.*
+                     , process ==1.*
+                     , reactive-banana ==0.8.*
+                     , timers ==0.2.*
+                     , transformers ==0.3.*
+                     , suspend ==0.2.*
+  ghc-options: -threaded

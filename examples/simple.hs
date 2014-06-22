@@ -22,7 +22,7 @@ main = do
     return $ cpuWidget cpu
 
 conf :: DzenConf
-conf = defaultConf { dzenArgs = ["-xs", "2"] }
+conf = defaultConf { dzenArgs = ["-xs", "1"] }
 
 cpuWidget :: CpuMonitor t -> Widget t
 cpuWidget cpu = let percent = round . (*100) <$> Cpu.busy cpu
