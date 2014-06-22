@@ -29,9 +29,15 @@ executable dzenbar
                      , Reactive.Banana.Sources
   build-depends:       base >=4.6 && <4.8
                      , bytestring >=0.10 && <0.11
+                     , colour ==2.*
+                     , mtl ==2.*
                      , process ==1.*
                      , reactive-banana ==0.8.*
                      , timers ==0.2.*
+                     , transformers ==0.3.*
                      , suspend ==0.2.*
   ghc-options: -threaded
-  other-extensions:    TypeFamilies, TupleSections, Rank2Types
+  other-extensions:    GeneralizedNewtypeDeriving
+                     , Rank2Types
+                     , TupleSections
+                     , TypeFamilies

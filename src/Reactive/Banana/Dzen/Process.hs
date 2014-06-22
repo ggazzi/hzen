@@ -20,7 +20,7 @@ import Reactive.Banana.Frameworks
 import qualified Reactive.Banana.Monitors.Tick as T
 
 
-import Reactive.Banana.Dzen.Widget
+import Reactive.Banana.Dzen.Widget (Widget(..), runWidget)
 
 -- | Configuration for the dzen process, including its executable
 --   and the frequency with which it should be updated.
@@ -57,7 +57,7 @@ runDzen conf monitors mWidget = do
     network <- compile $ do
       widget <- mWidget
       tick <- fromMonitorSource tickSrc
-      reactimate $ (\x -> hPutStrLn dzenIn x >> putStrLn x) <$> unWidget widget <@ T.tick tick
+      reactimate $ hPutStrLn dzenIn <$> runWidget widget <@ T.tick tick
 
     -- Run the network, and spawn a monitor updater
     actuate network
