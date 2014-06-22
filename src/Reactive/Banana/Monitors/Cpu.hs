@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing -fwarn-hi-shadowing #-}
 module Reactive.Banana.Monitors.Cpu
        ( CpuMonitor
        , busy
@@ -9,12 +10,14 @@ module Reactive.Banana.Monitors.Cpu
        , iowait
        , irq
        , softirq
-         
+
        , newMonitor
        ) where
 
 import Reactive.Banana.Monitors.Class
 import Reactive.Banana.Sources
+
+import Control.Monad (zipWithM_)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
@@ -26,43 +29,43 @@ import Reactive.Banana
 --
 -- Provides behaviors for the fraction of time that the
 -- CPU is spending in several states.
-data CpuMonitor t = CpuMonitor { busy    :: Behavior t Float
-                               , user    :: Behavior t Float
-                               , nice    :: Behavior t Float
-                               , system  :: Behavior t Float
-                               , idle    :: Behavior t Float
-                               , iowait  :: Behavior t Float
-                               , irq     :: Behavior t Float
-                               , softirq :: Behavior t Float
+data CpuMonitor t = CpuMonitor { busy    :: Behavior t Double
+                               , user    :: Behavior t Double
+                               , nice    :: Behavior t Double
+                               , system  :: Behavior t Double
+                               , idle    :: Behavior t Double
+                               , iowait  :: Behavior t Double
+                               , irq     :: Behavior t Double
+                               , softirq :: Behavior t Double
                                }
 
 newMonitor :: IO (SourceOf CpuMonitor)
 newMonitor = do
   sources <- sequence . take 8 $ repeat (newBehavior 0)
   let [busy, user, nice, system, idle, iowait, irq, softirq] = sources
-  return $ CpuSource
-            { sbusy    = busy
-            , suser    = user
-            , snice    = nice
-            , ssystem  = system
-            , sidle    = idle
-            , siowait  = iowait
-            , sirq     = irq
-            , ssoftirq = softirq
-            , updateCpuMonitor = updateMany sources
-            }
+  return CpuSource
+          { sbusy    = busy
+          , suser    = user
+          , snice    = nice
+          , ssystem  = system
+          , sidle    = idle
+          , siowait  = iowait
+          , sirq     = irq
+          , ssoftirq = softirq
+          , updateCpuMonitor = updateMany sources
+          }
 
 instance Monitor CpuMonitor where
   data SourceOf CpuMonitor = CpuSource
-            { sbusy    :: BehaviorSource Float
-            , suser    :: BehaviorSource Float
-            , snice    :: BehaviorSource Float
-            , ssystem  :: BehaviorSource Float
-            , sidle    :: BehaviorSource Float
-            , siowait  :: BehaviorSource Float
-            , sirq     :: BehaviorSource Float
-            , ssoftirq :: BehaviorSource Float
-            , updateCpuMonitor :: [Float] -> IO ()
+            { sbusy    :: BehaviorSource Double
+            , suser    :: BehaviorSource Double
+            , snice    :: BehaviorSource Double
+            , ssystem  :: BehaviorSource Double
+            , sidle    :: BehaviorSource Double
+            , siowait  :: BehaviorSource Double
+            , sirq     :: BehaviorSource Double
+            , ssoftirq :: BehaviorSource Double
+            , updateCpuMonitor :: [Double] -> IO ()
             }
 
   -- Just obtain all behaviors from behavior sources
@@ -89,7 +92,7 @@ instance Monitor CpuMonitor where
 -- 'IORef' and returns the fraction of time spent on
 -- each of the following states: busy (user + nice + system),
 -- user, nice, system, idle, iowait, irq, softirq.
-checkCpu :: IORef [Float] -> IO [Float]
+checkCpu :: IORef [Double] -> IO [Double]
 checkCpu cref = do
         -- Obtain the current and previous times
         prev <- readIORef cref
@@ -98,7 +101,7 @@ checkCpu cref = do
         writeIORef cref curr
             -- Calculate the time spent since last check
         let dif = zipWith (-) curr prev
-            tot = foldr (+) 0 dif
+            tot = sum dif
             -- Calculate the fractions for each state
             frac = map (/ tot) dif
             t = sum $ take 3 frac
@@ -109,16 +112,16 @@ checkCpu cref = do
 -- Given @m@ 'BehaviorSource's and @n@ values, update the first
 -- @min m n@ behaviors with the corresponding values.
 updateMany :: [BehaviorSource a] -> [a] -> IO ()
-updateMany sources vals = sequence_ $ zipWith update sources vals
+updateMany = zipWithM_ update
 
 -- | Obtain the total CPU time spent on each state, since the system startup
-readCpuData :: IO [Float]
+readCpuData :: IO [Double]
 readCpuData = cpuParser <$> B.readFile "/proc/stat"
 
 -- | Given the contents of /proc/stat, obtain the values about
--- all CPUs as a list of floats. Those values correspond to the
+-- all CPUs as a list of Doubles. Those values correspond to the
 -- CPU time spent since the system startup in the following
 -- states, respectively: user, nice, system, idle, iowait, irq,
 -- softirq.
-cpuParser :: B.ByteString -> [Float]
+cpuParser :: B.ByteString -> [Double]
 cpuParser = map (read . B.unpack) . tail . B.words . head . B.lines

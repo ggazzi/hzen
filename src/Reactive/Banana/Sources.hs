@@ -4,7 +4,7 @@ module Reactive.Banana.Sources
        , newEvent
        , fromEventSource
        , fire
-         
+
        , BehaviorSource
        , newBehavior
        , fromBehaviorSource

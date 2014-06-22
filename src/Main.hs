@@ -6,6 +6,9 @@ import Reactive.Banana.Monitors
 import Reactive.Banana.Monitors.Cpu (CpuMonitor)
 import qualified Reactive.Banana.Monitors.Cpu as Cpu
 
+import Reactive.Banana.Monitors.Tick (Tick)
+import qualified Reactive.Banana.Monitors.Tick as T
+
 
 import Control.Concurrent.Suspend (suspend, sDelay, hDelay)
 import Control.Concurrent.Timer
@@ -16,14 +19,13 @@ import Reactive.Banana.Frameworks
 
 main :: IO ()
 main = do
-  tickSrc <- newTick
+  tickSrc <- T.newTick
   cpuSrc  <- Cpu.newMonitor
-  
+
   network <- compile $ setupNetwork tickSrc cpuSrc
-  
+
   actuate network
   eventLoop tickSrc cpuSrc
-
 
 
 eventLoop :: SourceOf Tick -> SourceOf CpuMonitor -> IO ()
