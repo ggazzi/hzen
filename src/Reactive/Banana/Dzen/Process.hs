@@ -5,8 +5,10 @@ module Reactive.Banana.Dzen.Process
    ) where
 
 
-import Control.Concurrent.Suspend (Delay, suspend, msDelay)
+import Control.Concurrent.Suspend (Delay, msDelay)
+import Control.Concurrent.Timer (repeatedTimer, stopTimer)
 
+import System.Exit (exitWith)
 import System.IO
 import System.Process
 
@@ -49,26 +51,29 @@ runDzen conf monitors mWidget = do
     updateTick <- initMonitor tickSrc
 
     -- Create the dzen process
-    dzen <- createDzen conf
+    (dzenIn, dzenProc) <- createDzen conf
 
     -- Create a network that updates dzen with the widget whenever there's a tick
     network <- compile $ do
       widget <- mWidget
       tick <- fromMonitorSource tickSrc
-      reactimate $ (\x -> hPutStrLn dzen x >> putStrLn x) <$> unWidget widget <@ T.tick tick
+      reactimate $ (\x -> hPutStrLn dzenIn x >> putStrLn x) <$> unWidget widget <@ T.tick tick
 
-    -- Run the network, keep updating the monitors and wait forever
+    -- Run the network, and spawn a monitor updater
     actuate network
-    let loop = do updateMonitors monitors
-                  updateTick
-                  suspend (updateFreq conf)
-                  loop
-    loop
+    timer <- flip repeatedTimer (updateFreq conf) $ do
+      updateMonitors monitors
+      updateTick
+
+    -- Wait for the dzen process to end, then terminate
+    exitCode <- waitForProcess dzenProc
+    stopTimer timer
+    exitWith exitCode
 
 -- | Creates a process for dzen and return its standard input 'Handle'.
-createDzen :: DzenConf -> IO Handle
+createDzen :: DzenConf -> IO (Handle, ProcessHandle)
 createDzen conf = do
     let dzen = proc (dzenPath conf) (dzenArgs conf)
-    (Just handle, _, _, _) <- createProcess $ dzen { std_in = CreatePipe }
-    hSetBuffering handle LineBuffering
-    return handle
+    (Just inHandle, _, _, pHandle) <- createProcess $ dzen { std_in = CreatePipe }
+    hSetBuffering inHandle LineBuffering
+    return (inHandle, pHandle)

@@ -30,4 +30,5 @@ executable dzenbar
                      , reactive-banana ==0.8.*
                      , timers ==0.2.*
                      , suspend ==0.2.*
+  ghc-options: -threaded
   other-extensions:    TypeFamilies, TupleSections
