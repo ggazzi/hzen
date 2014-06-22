@@ -26,6 +26,7 @@ executable dzenbar
                      , Reactive.Banana.Monitors.Tick
   build-depends:       base >=4.6 && <4.8
                      , bytestring >=0.10 && <0.11
+                     , process ==1.*
                      , reactive-banana ==0.8.*
                      , timers ==0.2.*
                      , suspend ==0.2.*
