@@ -19,11 +19,14 @@ executable dzenbar
   main-is:             Main.hs
   hs-source-dirs:      src/
   default-language:    Haskell2010
-  other-modules:       Reactive.Banana.Sources
+  other-modules:       Reactive.Banana.Dzen
+                     , Reactive.Banana.Dzen.Process
+                     , Reactive.Banana.Dzen.Widget
                      , Reactive.Banana.Monitors
                      , Reactive.Banana.Monitors.Class
                      , Reactive.Banana.Monitors.Cpu
                      , Reactive.Banana.Monitors.Tick
+                     , Reactive.Banana.Sources
   build-depends:       base >=4.6 && <4.8
                      , bytestring >=0.10 && <0.11
                      , process ==1.*
