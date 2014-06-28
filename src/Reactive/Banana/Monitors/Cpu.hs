@@ -1,5 +1,19 @@
+{-|
+Copyright: (c) Guilherme Azzi, 2014
+License: MIT
+Maintainer: ggazzi@inf.ufrgs.br
+Stability: experimental
+
+A 'Monitor' for the CPU activity.
+
+This module is meant to be imported qualified, e.g.:
+
+>  import qualified Reactive.Banana.Monitors.Cpu as Cpu
+
+-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+
 module Reactive.Banana.Monitors.Cpu
        ( CpuMonitor
        , busy

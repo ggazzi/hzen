@@ -1,4 +1,18 @@
+{-|
+Copyright: (c) Guilherme Azzi, 2014
+License: MIT
+Maintainer: ggazzi@inf.ufrgs.br
+Stability: experimental
+
+A 'Monitor' used for synchronization/timing.
+
+This module is meant to be imported qualified, e.g.:
+
+>  import qualified Reactive.Banana.Monitors.Tick as T
+
+-}
 {-# LANGUAGE TypeFamilies #-}
+
 module Reactive.Banana.Monitors.Tick
        ( Tick
        , tick
@@ -9,7 +23,8 @@ import Reactive.Banana
 import Reactive.Banana.Sources
 import Reactive.Banana.Monitors.Class
 
--- | Monitor with no content.
+-- | A 'Monitor' providing a single 'Event' with no content, meat to be used for
+-- synchronization/timing.
 newtype Tick t = Tick { tick :: Event t () }
 
 newTick :: IO (SourceOf Tick)
