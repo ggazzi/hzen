@@ -34,4 +34,8 @@ conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
 
 cpuWidget :: CpuMonitor t -> Widget t
 cpuWidget cpu = let percent = round . (*100) <$> Cpu.busy cpu
-                in label "CPU: " <> withFg C.green (wshow percent) <> label "%"
+                    color = gradients [(0.1, C.limegreen),
+                                       (0.5, C.yellow),
+                                       (0.9, C.red)]
+                                      (Cpu.busy cpu)
+                in label "CPU: " <> fgB color (wshow percent) <> label "%"
