@@ -29,7 +29,8 @@ main = do
     return $ cpuWidget cpu
 
 conf :: DzenConf
-conf = defaultConf { dzenArgs = ["-xs", "1"] }
+conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
+                                 "-e", "button3=unhide"] } -- Workaround to avoid dzen being closed by left-clicks
 
 cpuWidget :: CpuMonitor t -> Widget t
 cpuWidget cpu = let percent = round . (*100) <$> Cpu.busy cpu
