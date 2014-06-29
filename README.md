@@ -1,7 +1,7 @@
 hzen
 ====
 
-This package provides utilities for implementing status bars in a functional reactive style.
+This library provides utilities for implementing status bars in a functional reactive style.
 The actual rendering is done by the [dzen](github.com/robm/dzen) program, which receives a
 textual description of what it should render, therefore users should ensure that this program
 is installed.
