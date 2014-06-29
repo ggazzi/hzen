@@ -117,7 +117,8 @@ checkCpu cref = do
         let dif = zipWith (-) curr prev
             tot = sum dif
             -- Calculate the fractions for each state
-            frac = map (/ tot) dif
+            frac = map (nanProof . (/ tot)) dif
+            nanProof x = if isNaN x || isInfinite x then 0 else x
             t = sum $ take 3 frac
         return (t:frac)
 
