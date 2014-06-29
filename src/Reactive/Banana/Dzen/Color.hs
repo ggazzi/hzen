@@ -1,3 +1,10 @@
+{-|
+Copyright: (c) Guilherme Azzi, 2014
+License: MIT
+Maintainer: ggazzi@inf.ufrgs.br
+Stability: experimental
+-}
+
 module Reactive.Banana.Dzen.Color
   ( withFg, withBg
   , withDefaultFg, withDefaultBg
@@ -11,7 +18,7 @@ import Data.Colour
 import Data.Colour.SRGB
 
 
-import Reactive.Banana.Dzen.Widget
+import Reactive.Banana.Dzen.Internal.Widget
 
 
 withFg, withBg :: Colour Double -> Widget t -> Widget t

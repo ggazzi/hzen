@@ -1,20 +1,24 @@
+{-|
+Copyright: (c) Guilherme Azzi, 2014
+License: MIT
+Maintainer: ggazzi@inf.ufrgs.br
+Stability: experimental
+-}
 {-# LANGUAGE Rank2Types #-}
+
 module Reactive.Banana.Dzen.Process
    ( DzenConf(..), defaultConf
    , runDzen
    ) where
 
 
-import Control.Concurrent.Suspend (Delay, msDelay)
 import Control.Concurrent.Timer (repeatedTimer, stopTimer)
 
-import Data.Colour
 import Data.Colour.SRGB
 
 import System.Exit (exitWith)
 import System.IO
 import System.Process
-
 
 import Reactive.Banana
 import Reactive.Banana.Monitors
@@ -22,29 +26,9 @@ import Reactive.Banana.Frameworks
 
 import qualified Reactive.Banana.Monitors.Tick as T
 
+import Reactive.Banana.Dzen.Internal.Config
+import Reactive.Banana.Dzen.Internal.Widget (Widget, evalWidget)
 
-import Reactive.Banana.Dzen.Widget (Widget(..), runWidget)
-
--- | Configuration for the dzen process, including its executable
--- and the frequency with which it should be updated.
---
--- Some of the command-line arguments passed to dzen are explicitly
--- represented in 'DzenConf'. Those are appended to the end of 'dzenArgs'
--- when creating the process.
-data DzenConf = DzenConf
-  { dzenPath :: FilePath
-  , dzenArgs :: [String]
-  , fgColor  :: Maybe (Colour Double)
-  , bgColor  :: Maybe (Colour Double)
-  , updateFreq :: Delay }
-
--- | A default configuration
-defaultConf :: DzenConf
-defaultConf = DzenConf { dzenPath = "dzen2"
-                       , dzenArgs = []
-                       , updateFreq = msDelay 500
-                       , fgColor = Nothing
-                       , bgColor = Nothing }
 
 -- | Run the main loop for the dzen bar.
 --
@@ -68,7 +52,7 @@ runDzen conf monitors mWidget = do
     network <- compile $ do
       widget <- mWidget
       tick <- fromMonitorSource tickSrc
-      reactimate $ hPutStrLn dzenIn <$> runWidget widget <@ T.tick tick
+      reactimate $ hPutStrLn dzenIn <$> evalWidget widget conf <@ T.tick tick
 
     -- Run the network, and spawn a monitor updater
     actuate network

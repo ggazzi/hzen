@@ -1,3 +1,10 @@
+{-|
+Copyright: (c) Guilherme Azzi, 2014
+License: MIT
+Maintainer: ggazzi@inf.ufrgs.br
+Stability: experimental
+-}
+
 module Reactive.Banana.Dzen
    ( DzenConf(..), defaultConf
    , runDzen
