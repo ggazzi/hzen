@@ -19,8 +19,6 @@ module Reactive.Banana.Monitors.Class
 import Reactive.Banana
 import Reactive.Banana.Frameworks hiding (newEvent)
 
-import Data.Maybe (catMaybes)
-
 -- | A monitor of the system, providing one or more 'Event's and 'Behavior's.
 --
 -- Each instance of this class should group information about some part of the
