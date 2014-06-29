@@ -10,6 +10,10 @@ This package just provides a structured way to feed dzen with data. A sample con
 be found in `examples/simple.hs`, and it may be executed by calling `cabal run` in the root
 directory of this project.
 
+While this README is admittedly tiny, the haddock-based documentation is much more extensive.
+In order to read it, either browse the source files themselves or run `cabal haddock`, then
+open the created html files.
+
 The major components of this are Monitors and Widgets. There is a heavy dependency on the
 reactive-banana package, and a lot of inspiration was drawn from the xmobar and dzen-utils
 packages.
