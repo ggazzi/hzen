@@ -32,13 +32,15 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src/
   exposed-modules:     Reactive.Banana.Dzen
+                     , Reactive.Banana.Dzen.Process
+                     , Reactive.Banana.Dzen.Widget
                      , Reactive.Banana.Dzen.Color
                      , Reactive.Banana.Monitors
                      , Reactive.Banana.Monitors.Cpu
                      , Reactive.Banana.Monitors.Tick
                      , Reactive.Banana.Sources
-  other-modules:       Reactive.Banana.Dzen.Process
-                     , Reactive.Banana.Dzen.Widget
+  other-modules:       Reactive.Banana.Dzen.Internal.Config
+                     , Reactive.Banana.Dzen.Internal.Widget
                      , Reactive.Banana.Monitors.Class
   default-language:    Haskell2010
   build-depends:       base >=4.6 && <4.8
