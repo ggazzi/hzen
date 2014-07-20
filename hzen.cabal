@@ -35,6 +35,7 @@ library
                      , Reactive.Banana.Dzen.Color
                      , Reactive.Banana.Dzen.Graphics
                      , Reactive.Banana.Dzen.Process
+                     , Reactive.Banana.Dzen.Unsafe.Position
                      , Reactive.Banana.Dzen.Widget
                      , Reactive.Banana.Monitors
                      , Reactive.Banana.Monitors.Cpu

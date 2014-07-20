@@ -72,6 +72,7 @@ data DzenState = DzSt
   { fgColor  :: Maybe (Colour Double)
   , bgColor  :: Maybe (Colour Double)
   , ignoreBg :: Bool
+  , yPos     :: Maybe Int
   }
 
 -- | Append the given string to the output of the widget.
@@ -117,4 +118,5 @@ initialState conf = DzSt
   { fgColor  = Conf.fgColor conf
   , bgColor  = Conf.bgColor conf
   , ignoreBg = False
+  , yPos     = Nothing
   }

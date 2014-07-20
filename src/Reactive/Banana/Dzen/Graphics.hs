@@ -16,12 +16,17 @@ module Reactive.Banana.Dzen.Graphics
   , rect, rectB, rectO, rectOB
   , square, squareB, squareO, squareOB
   , circle, circleB, circleO, circleOB
+  -- * Position
+  , spacer, spacerB, separator
+  , ypos, ycenter
   ) where
 
 import Control.Applicative
+import Data.Monoid
 
 import Reactive.Banana
 import Reactive.Banana.Dzen.Internal.Widget
+import Reactive.Banana.Dzen.Unsafe.Position
 
 
 -- | Draw an icon that can be found on the given path
@@ -79,7 +84,25 @@ circleOB :: Behavior t Int -> Widget t
 circleOB = Widget . fmap (shape1 "co")
 
 shape1 :: String -> Int -> WidgetM ()
-shape1 s x = tellStrings ["^", s, "(", show x, ")"]
+shape1 s x = command s [show x]
 
 shape2 :: String -> (Int, Int) -> WidgetM ()
-shape2 s (x,y) = tellStrings ["^", s, "(", show x, "x", show y, ")"]
+shape2 s (x,y) = command s [show x, "x", show y]
+
+-- | Leave the given amount of pixels empty.
+spacer :: Int -> Widget t
+spacer = xpos . max 0  -- We ensure the position never goes back.
+
+-- | Leave the given time-varying amount of pixels empty.
+spacerB :: Behavior t Int -> Widget t
+spacerB = xposB . fmap (max 0)
+
+-- | Draw a 1px-thin vertical bar sorrounded by some empty space.
+--
+-- Receives the (horizontal, vertical) size of the divider. The
+-- vertical bar is drawn in the center of the given space,
+separator :: (Int, Int) -> Widget t
+separator (x,y) = let x' = max x 0
+                      fstSpace = x' `div` 2
+                      sndSpace = x' - fstSpace - 1
+                  in xpos fstSpace <> rect (1,y) <> xpos sndSpace

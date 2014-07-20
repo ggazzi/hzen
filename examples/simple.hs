@@ -27,7 +27,7 @@ main = do
 
   debugDzen putStrLn conf monitors $ do
     cpu <- fromMonitorSource cpuSrc
-    return $ cpuWidget cpu <> label " " <> icon "examples/bitmaps/battery.xbm"
+    return $ cpuWidget cpu <> sep <> ypos (-5) (icon "examples/bitmaps/battery.xbm")
 
 conf :: DzenConf
 conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
@@ -40,3 +40,6 @@ cpuWidget cpu = let percent = round . (*100) <$> Cpu.busy cpu
                                        (0.9, C.red)]
                                       (Cpu.busy cpu)
                 in label "CPU: " <> fgB color (wshow percent) <> label "%"
+
+sep :: Widget t
+sep = separator (20,15)
