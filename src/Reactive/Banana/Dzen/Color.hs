@@ -57,7 +57,7 @@ changeColorM typ f = \subWidget -> do
     modify (\s -> s {fgColor = prevColor})
 
 setColor :: (RealFrac a, Floating a) => String -> Maybe (Colour a) -> WidgetM ()
-setColor s c = tellString $ "^" ++ s ++ "(" ++ maybe "" sRGB24show c ++ ")"
+setColor s c = command s [maybe "" sRGB24show c]
 
 
 -- | Produces a time-varying colour by blending the given colors.

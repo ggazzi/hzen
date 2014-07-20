@@ -17,6 +17,8 @@ module Reactive.Banana.Dzen.Internal.Widget(
   , DzenState(..)
   , evalWidgetM
   , tellString
+  , tellStrings
+  , command
 ) where
 
 
@@ -76,6 +78,25 @@ data DzenState = DzSt
 -- Helper function to automatically convert 'String's to difference lists.
 tellString :: String -> WidgetM ()
 tellString = tell . (++)
+{-# INLINE tellString #-}
+
+-- | Append the given strings, in the given order, to the output of the widget.
+--
+-- Helper function to automatically convert 'String's to difference lists.
+tellStrings :: [String] -> WidgetM ()
+tellStrings = mapM_ tellString
+{-# INLINE tellStrings #-}
+
+-- | Append the given command with the given parameters to the output of the
+-- widget.
+--
+-- Examples:
+--  * @command "fg" []@ ==> @^fg()@
+--  * @command "p" ["3"]@ ==> @^p(3)@
+--  * @command "r" ["5", "x", "5"] ==> @^r(5x5)@
+command :: String -> [String] -> WidgetM ()
+command c p = tellStrings ['^':c, "("] >> tellStrings p >> tellString ")"
+{-# INLINE command #-}
 
 -- | Runs the widget monad, given the initial state, and obtains the sequential
 -- textual description of what dzen should display.
