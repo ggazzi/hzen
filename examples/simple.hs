@@ -24,7 +24,7 @@ main = do
   cpuSrc  <- Cpu.newMonitor
   monitors <- sequence [initMonitor cpuSrc]
 
-  runDzen conf monitors $ do
+  debugDzen putStrLn conf monitors $ do
     cpu <- fromMonitorSource cpuSrc
     return $ cpuWidget cpu
 

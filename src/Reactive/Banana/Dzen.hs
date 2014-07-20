@@ -7,7 +7,7 @@ Stability: experimental
 
 module Reactive.Banana.Dzen
    ( DzenConf(..), defaultConf
-   , runDzen
+   , runDzen, debugDzen
 
    , Widget
    , label

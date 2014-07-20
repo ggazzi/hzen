@@ -8,7 +8,7 @@ Stability: experimental
 
 module Reactive.Banana.Dzen.Process
    ( DzenConf(..), defaultConf
-   , runDzen
+   , runDzen, debugDzen
    ) where
 
 
@@ -40,7 +40,32 @@ runDzen :: DzenConf                 -- ^ Configuration for the dzen process.
         -> (forall t. Frameworks t
             => Moment t (Widget t)) -- ^ Description of what the bar should display.
         -> IO ()
-runDzen conf monitors mWidget = do
+runDzen = execDzen hPutStrLn
+
+-- | Run the main loop for the dzen bar.
+--
+-- Spawn the dzen process according to the given configuration, then
+-- periodically update the appropriate 'Monitor's, then update the given
+-- 'Widget' and display it on the bar.
+--
+-- To help debugging the configuration, an extra action is taken with the
+-- dzen string, whenever it is produced.
+debugDzen :: (String -> IO ())      -- ^ Extra action to be taken with the dzen string.
+        -> DzenConf                 -- ^ Configuration for the dzen process.
+        -> [MonitorUpdater]         -- ^ 'Monitor's that should be updated.
+        -> (forall t. Frameworks t
+            => Moment t (Widget t)) -- ^ Description of what the bar should display.
+        -> IO ()
+debugDzen dbg = execDzen (\dzenIn txt -> hPutStrLn dzenIn txt >> dbg txt)
+
+execDzen :: (Handle -> String -> IO ()) -- ^ Action for updating dzen, given its text.
+         -> DzenConf                    -- ^ Configuration for the dzen process.
+         -> [MonitorUpdater]            -- ^ 'Monitor's that should be updated.
+         -> (forall t. Frameworks t
+             => Moment t (Widget t))    -- ^ Description of what the bar should display.
+         -> IO ()
+{-# INLINE execDzen #-}
+execDzen updateDzen = \conf monitors mWidget -> do
     -- Create a tick for updating the dzen bar
     tickSrc <- T.newTick
     updateTick <- initMonitor tickSrc
@@ -52,7 +77,8 @@ runDzen conf monitors mWidget = do
     network <- compile $ do
       widget <- mWidget
       tick <- fromMonitorSource tickSrc
-      reactimate $ hPutStrLn dzenIn <$> evalWidget widget conf <@ T.tick tick
+      reactimate $ updateDzen dzenIn
+                <$> evalWidget widget conf <@ T.tick tick
 
     -- Run the network, and spawn a monitor updater
     actuate network
