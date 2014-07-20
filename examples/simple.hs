@@ -18,6 +18,7 @@ import Data.Monoid
 import Reactive.Banana
 import Reactive.Banana.Dzen
 import Reactive.Banana.Dzen.Color
+import Reactive.Banana.Dzen.Graphics
 
 main :: IO ()
 main = do
@@ -26,7 +27,7 @@ main = do
 
   debugDzen putStrLn conf monitors $ do
     cpu <- fromMonitorSource cpuSrc
-    return $ cpuWidget cpu
+    return $ cpuWidget cpu <> label " " <> icon "examples/bitmaps/battery.xbm"
 
 conf :: DzenConf
 conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
