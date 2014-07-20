@@ -10,6 +10,7 @@ Provides combinators for changing the colors of widgets.
 
 module Reactive.Banana.Dzen.Color
   ( fg, bg, fgB, bgB
+  , ignoreBg, drawBg
   , gradient, gradients
   ) where
 
@@ -21,7 +22,8 @@ import Data.Colour.SRGB
 import qualified Data.List as L
 
 import Reactive.Banana
-import Reactive.Banana.Dzen.Internal.Widget
+import Reactive.Banana.Dzen.Internal.Widget (Widget(..), unWidget, WidgetM, command)
+import qualified Reactive.Banana.Dzen.Internal.Widget as W
 
 -- | Sets the foreground color of the given widget.
 fg :: Colour Double -> Widget t -> Widget t
@@ -43,21 +45,51 @@ bgB = withColorB "bg" . fmap Just
 withColor :: String -> Maybe (Colour Double) -> Widget t -> Widget t
 withColor typ c = Widget . fmap (changeColorM typ (const c)) . unWidget
 
-withColorB :: String -> Behavior t (Maybe (Colour Double)) -> Widget t -> Widget t
+withColorB :: String
+           -> Behavior t (Maybe (Colour Double))
+           -> Widget t
+           -> Widget t
 withColorB typ bc = Widget . (changeColorM typ <$> (const <$> bc) <*>) . unWidget
 
-changeColorM :: String -> (Maybe (Colour Double) -> Maybe (Colour Double)) -> WidgetM () -> WidgetM ()
+changeColorM :: String                     -- ^ Name of command used for changing the color.
+             -> (Maybe (Colour Double)
+                 -> Maybe (Colour Double)) -- ^ Function used to change the color.
+             -> WidgetM ()                 -- ^ Transformed widget
+             -> WidgetM ()
 changeColorM typ f = \subWidget -> do
-    prevColor <- gets fgColor
-    let newColor = f prevColor
-    modify (\s -> s {fgColor = newColor})
-    setColor typ newColor
+    prevColor <- gets W.fgColor
+    setColor typ (f prevColor)
     subWidget
     setColor typ prevColor
-    modify (\s -> s {fgColor = prevColor})
+  where setColor comm col = do modify (\s -> s {W.fgColor = col})
+                               command comm [maybe "" sRGB24show col]
 
-setColor :: (RealFrac a, Floating a) => String -> Maybe (Colour a) -> WidgetM ()
-setColor s c = command s [maybe "" sRGB24show c]
+-- | The transformed widget does not draw its background, only the foreground.
+--
+-- This is useful when drawing over previously drawn content, which will not be
+-- entirely overwritten. This allows the creation of composite shapes.
+ignoreBg :: Widget t -> Widget t
+ignoreBg = Widget . fmap (changeIgnoreBg True) . unWidget
+
+-- | The transformed widget draws both its background and foreground.
+--
+-- When drawing over previously drawn content, overwrite it entirely.
+drawBg :: Widget t -> Widget t
+drawBg = Widget . fmap (changeIgnoreBg False) . unWidget
+
+changeIgnoreBg :: Bool -> WidgetM () -> WidgetM ()
+changeIgnoreBg ignore = \subWidget -> do
+    prevIgnore <- gets W.ignoreBg
+    if ignore /= prevIgnore
+    then do
+      setIB ignore
+      subWidget
+      setIB prevIgnore
+    else
+      subWidget
+  where setIB i = do modify (\s -> s {W.ignoreBg=ignore})
+                     command "ib" [if i then "1" else "0"]
+
 
 
 -- | Produces a time-varying colour by blending the given colors.

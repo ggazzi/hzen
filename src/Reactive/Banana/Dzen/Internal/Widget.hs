@@ -69,8 +69,9 @@ instance Monoid w => Monoid (WidgetM w) where
   mappend = (>>)
 
 data DzenState = DzSt
-  { fgColor :: Maybe (Colour Double)
-  , bgColor :: Maybe (Colour Double)
+  { fgColor  :: Maybe (Colour Double)
+  , bgColor  :: Maybe (Colour Double)
+  , ignoreBg :: Bool
   }
 
 -- | Append the given string to the output of the widget.
@@ -113,6 +114,7 @@ evalWidget (Widget bhv) conf = flip evalWidgetM (initialState conf) <$> bhv
 -- | Obtain the initial state of the dzen bar, given its configuration.
 initialState :: DzenConf -> DzenState
 initialState conf = DzSt
-  { fgColor = Conf.fgColor conf
-  , bgColor = Conf.bgColor conf
+  { fgColor  = Conf.fgColor conf
+  , bgColor  = Conf.bgColor conf
+  , ignoreBg = False
   }
