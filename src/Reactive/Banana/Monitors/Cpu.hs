@@ -33,7 +33,9 @@ import Reactive.Banana.Sources
 
 import Control.Monad (zipWithM_)
 
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
+
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
 import Reactive.Banana
@@ -131,12 +133,12 @@ updateMany = zipWithM_ update
 
 -- | Obtain the total CPU time spent on each state, since the system startup
 readCpuData :: IO [Double]
-readCpuData = cpuParser <$> B.readFile "/proc/stat"
+readCpuData = cpuParser <$> T.readFile "/proc/stat"
 
 -- | Given the contents of /proc/stat, obtain the values about
 -- all CPUs as a list of Doubles. Those values correspond to the
 -- CPU time spent since the system startup in the following
 -- states, respectively: user, nice, system, idle, iowait, irq,
 -- softirq.
-cpuParser :: B.ByteString -> [Double]
-cpuParser = map (read . B.unpack) . tail . B.words . head . B.lines
+cpuParser :: T.Text -> [Double]
+cpuParser = map (read . T.unpack) . tail . T.words . head . T.lines

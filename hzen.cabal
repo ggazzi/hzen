@@ -52,6 +52,7 @@ library
                      , mtl ==2.*
                      , process ==1.*
                      , reactive-banana ==0.8.*
+                     , text ==1.1.*
                      , timers ==0.2.*
                      , transformers ==0.3.*
                      , suspend ==0.2.*
