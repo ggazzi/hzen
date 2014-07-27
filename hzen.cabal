@@ -32,6 +32,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src/
   exposed-modules:     Reactive.Banana.Dzen
+                     , Reactive.Banana.Dzen.Bars
                      , Reactive.Banana.Dzen.Color
                      , Reactive.Banana.Dzen.Graphics
                      , Reactive.Banana.Dzen.Process
