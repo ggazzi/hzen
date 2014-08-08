@@ -22,10 +22,14 @@ module Reactive.Banana.Dzen.Widget
 
 
 import Control.Applicative
+import Data.String
 
 import Reactive.Banana
 import Reactive.Banana.Dzen.Internal.Widget
 
+
+instance IsString (Widget t) where
+  fromString = label
 
 -- | Displays an invariant string.
 --
