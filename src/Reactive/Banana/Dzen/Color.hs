@@ -87,8 +87,8 @@ changeIgnoreBg ignore = \subWidget -> do
       setIB prevIgnore
     else
       subWidget
-  where setIB i = do modify (\s -> s {W.ignoreBg=ignore})
-                     command "ib" [if i then "1" else "0"]
+  where setIB b = do modify (\s -> s {W.ignoreBg=b})
+                     command "ib" [if b then "1" else "0"]
 
 
 
