@@ -4,6 +4,7 @@ License: MIT
 Maintainer: ggazzi@inf.ufrgs.br
 Stability: experimental
 -}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main(main) where
 
@@ -11,10 +12,13 @@ import Reactive.Banana.Monitors
 
 import Reactive.Banana.Monitors.Cpu (CpuMonitor)
 import qualified Reactive.Banana.Monitors.Cpu as Cpu
+import Reactive.Banana.Monitors.Mem (MemMonitor)
+import qualified Reactive.Banana.Monitors.Mem as Mem
 
 import qualified Data.Colour.Names as C
 import Data.Monoid
 
+import Reactive.Banana
 import Reactive.Banana.Dzen
 import Reactive.Banana.Dzen.Color
 import Reactive.Banana.Dzen.Graphics
@@ -24,23 +28,26 @@ import qualified Reactive.Banana.Dzen.Bars as B
 main :: IO ()
 main = do
   cpuSrc  <- Cpu.newMonitor
-  monitors <- sequence [initMonitor cpuSrc]
+  memSrc  <- Mem.newMonitor
+  monitors <- sequence [initMonitor cpuSrc, initMonitor memSrc]
 
   debugDzen putStrLn conf monitors $ do
     cpu <- fromMonitorSource cpuSrc
-    return $ cpuWidget cpu <> sep <> ypos (-5) (icon "examples/bitmaps/battery.xbm")
+    mem <- fromMonitorSource memSrc
+    return $ "Mem " <> costBar (Mem.usedRatio mem) <> sep
+          <> "CPU " <> costBar (Cpu.busy cpu) <> sep
+          <> ypos (-5) (icon "examples/bitmaps/battery.xbm")
 
 conf :: DzenConf
 conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
                                  "-e", "button3=unhide"] } -- Workaround to avoid dzen being closed by right-clicks
 
-cpuWidget :: CpuMonitor t -> Widget t
-cpuWidget cpu = let color = gradients [(0.1, C.limegreen),
-                                       (0.5, C.yellow),
-                                       (0.9, C.red)]
-                                      (Cpu.busy cpu)
-                    bar = vbar [B.Size (10,16), B.ColourB color] (Cpu.busy cpu)
-                in label "CPU" <> spacer 5 <> bar
+costBar :: Behavior t Double -> Widget t
+costBar cost = let color = gradients [(0.1, C.limegreen),
+                                      (0.5, C.yellow),
+                                      (0.9, C.red)]
+                                     cost
+               in vbar [B.Size (10,16), B.ColourB color] cost
 
 sep :: Widget t
 sep = separator (20,15)
