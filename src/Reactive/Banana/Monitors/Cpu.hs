@@ -39,6 +39,7 @@ import qualified Data.Text.IO as T
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
 import Reactive.Banana
+import qualified Reactive.Banana.Monitors.Internal.Procfs as Procfs
 
 
 -- | A monitor for the CPU activity.
@@ -97,7 +98,7 @@ instance Monitor CpuMonitor where
 
   initMonitor src = do
     -- Obtain an IORef with the current CPU time
-    initial <- readCpuData
+    initial <- Procfs.readStatCpu
     cpuTimeRef <- newIORef initial
     -- Use the IORef to update (comparing the previous times
     -- with the current, for how much time was spent in each
@@ -112,7 +113,7 @@ checkCpu :: IORef [Double] -> IO [Double]
 checkCpu cref = do
         -- Obtain the current and previous times
         prev <- readIORef cref
-        curr <- readCpuData
+        curr <- Procfs.readStatCpu
         -- Update the IORef
         writeIORef cref curr
             -- Calculate the time spent since last check
@@ -130,15 +131,3 @@ checkCpu cref = do
 -- @min m n@ behaviors with the corresponding values.
 updateMany :: [BehaviorSource a] -> [a] -> IO ()
 updateMany = zipWithM_ update
-
--- | Obtain the total CPU time spent on each state, since the system startup
-readCpuData :: IO [Double]
-readCpuData = cpuParser <$> T.readFile "/proc/stat"
-
--- | Given the contents of /proc/stat, obtain the values about
--- all CPUs as a list of Doubles. Those values correspond to the
--- CPU time spent since the system startup in the following
--- states, respectively: user, nice, system, idle, iowait, irq,
--- softirq.
-cpuParser :: T.Text -> [Double]
-cpuParser = map (read . T.unpack) . tail . T.words . head . T.lines

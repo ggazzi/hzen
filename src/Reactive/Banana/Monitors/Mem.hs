@@ -19,22 +19,14 @@ module Reactive.Banana.Monitors.Mem where
 import Control.Monad
 
 import Data.Map (Map)
-import Data.Maybe (mapMaybe)
-import Data.Set (Set)
 import Data.Text (Text)
 
-import qualified Data.Char as C
 import qualified Data.Map as M
-import qualified Data.List as L
-import qualified Data.Set as S
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-
-import Data.Attoparsec.Text as P
 
 import Reactive.Banana
 import Reactive.Banana.Sources
 import Reactive.Banana.Monitors.Class
+import qualified Reactive.Banana.Monitors.Internal.Procfs as Procfs
 
 
 -- | A monitor for the memory usage.
@@ -85,32 +77,4 @@ updateMemMonitor mon fields = do
   update (susedRatio mon) $ fromIntegral used / fromIntegral total
 
 checkMem :: IO (Map Text Int)
-checkMem = M.map (`div` 1024) . parseFile relevantFields <$> T.readFile "/proc/meminfo"
-  where relevantFields = S.fromList ["MemTotal", "MemFree", "Buffers", "Cached", "MemAvailable"]
-
--- | Parses the text contained in the @/proc/meminfo@ file, keeping only the
--- information about the given set of expected fields.
-parseFile :: Set Text -> Text -> Map Text Int
-parseFile relevant input = case parseOnly (file relevant) input of
-  Left  msg -> error $ "Failed parsing /proc/meminfo: " ++ msg
-  Right res -> res
-
--- | Parser for the whole @/proc/meminfo@ file.
-file :: Set Text -> Parser (Map Text Int)
-file relevant = scan M.empty
-  where scan acc =  (endOfInput *> pure acc)
-                <|> (line relevant acc >>= scan)
-
--- | Parser for a line of the @/proc/meminfo@ file.
---
--- The line should have the format
--- @FieldName: value [kB]@, where value is a number.
-line :: Set Text -> Map Text Int -> Parser (Map Text Int)
-line relevant acc = do label <- P.takeWhile notColon
-                       char ':'
-                       result <- if label `S.member` relevant
-                         then M.insert label <$> (skipSpace *> decimal) <*> pure acc
-                         else pure acc
-                       skipWhile (not . isEndOfLine) *> skipWhile isEndOfLine
-                       return result
-  where notColon c = c /= ':' && not (isEndOfLine c)
+checkMem = Procfs.readMeminfo ["MemTotal", "MemFree", "Buffers", "Cached", "MemAvailable"]
