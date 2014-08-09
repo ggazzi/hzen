@@ -14,6 +14,8 @@ import Reactive.Banana.Monitors.Cpu (CpuMonitor)
 import qualified Reactive.Banana.Monitors.Cpu as Cpu
 import Reactive.Banana.Monitors.Mem (MemMonitor)
 import qualified Reactive.Banana.Monitors.Mem as Mem
+import Reactive.Banana.Monitors.Swap (SwapMonitor)
+import qualified Reactive.Banana.Monitors.Swap as Swap
 
 import qualified Data.Colour.Names as C
 import Data.Monoid
@@ -29,13 +31,15 @@ main :: IO ()
 main = do
   cpuSrc  <- Cpu.newMonitor
   memSrc  <- Mem.newMonitor
-  monitors <- sequence [initMonitor cpuSrc, initMonitor memSrc]
+  swapSrc <- Swap.newMonitor
+  monitors <- sequence [initMonitor cpuSrc, initMonitor memSrc, initMonitor swapSrc]
 
   debugDzen putStrLn conf monitors $ do
-    cpu <- fromMonitorSource cpuSrc
-    mem <- fromMonitorSource memSrc
-    return $ "Mem " <> costBar (Mem.usedRatio mem) <> sep
-          <> "CPU " <> costBar (Cpu.busy cpu) <> sep
+    cpu  <- fromMonitorSource cpuSrc
+    mem  <- fromMonitorSource memSrc
+    swap <- fromMonitorSource swapSrc
+    return $ "CPU " <> costBar (Cpu.busy cpu) <> sep
+          <> "Mem " <> costBar (Mem.usedRatio mem) <> spacer 3 <> costBar (Swap.usedRatio swap) <> sep
           <> ypos (-5) (icon "examples/bitmaps/battery.xbm")
 
 conf :: DzenConf

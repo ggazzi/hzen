@@ -41,6 +41,7 @@ library
                      , Reactive.Banana.Monitors
                      , Reactive.Banana.Monitors.Cpu
                      , Reactive.Banana.Monitors.Mem
+                     , Reactive.Banana.Monitors.Swap
                      , Reactive.Banana.Monitors.Tick
                      , Reactive.Banana.Sources
   other-modules:       Reactive.Banana.Dzen.Internal.Config
