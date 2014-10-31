@@ -36,6 +36,7 @@ library
                      , Reactive.Banana.Dzen.Color
                      , Reactive.Banana.Dzen.Graphics
                      , Reactive.Banana.Dzen.Process
+                     , Reactive.Banana.Dzen.Time
                      , Reactive.Banana.Dzen.Unsafe.Position
                      , Reactive.Banana.Dzen.Widget
                      , Reactive.Banana.Monitors
@@ -43,6 +44,7 @@ library
                      , Reactive.Banana.Monitors.Mem
                      , Reactive.Banana.Monitors.Swap
                      , Reactive.Banana.Monitors.Tick
+                     , Reactive.Banana.Monitors.Time
                      , Reactive.Banana.Sources
   other-modules:       Reactive.Banana.Dzen.Internal.Config
                      , Reactive.Banana.Dzen.Internal.Widget
@@ -55,9 +57,11 @@ library
                      , colour ==2.*
                      , containers ==0.5.*
                      , mtl ==2.*
+                     , old-locale ==1.0.*
                      , process ==1.*
                      , reactive-banana ==0.8.*
                      , text ==1.1.*
+                     , time ==1.4.*
                      , timers ==0.2.*
                      , transformers ==0.3.*
                      , suspend ==0.2.*
@@ -76,6 +80,7 @@ executable dzenbar
                      , colour ==2.*
                      , hzen
                      , mtl ==2.*
+                     , old-locale ==1.0.*
                      , process ==1.*
                      , reactive-banana ==0.8.*
                      , timers ==0.2.*

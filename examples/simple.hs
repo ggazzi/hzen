@@ -16,15 +16,19 @@ import Reactive.Banana.Monitors.Mem (MemMonitor)
 import qualified Reactive.Banana.Monitors.Mem as Mem
 import Reactive.Banana.Monitors.Swap (SwapMonitor)
 import qualified Reactive.Banana.Monitors.Swap as Swap
+import Reactive.Banana.Monitors.Time (TimeMonitor)
+import qualified Reactive.Banana.Monitors.Time as Time
 
 import qualified Data.Colour.Names as C
 import Data.Monoid
+import System.Locale (defaultTimeLocale)
 
 import Reactive.Banana
 import Reactive.Banana.Dzen
 import Reactive.Banana.Dzen.Color
 import Reactive.Banana.Dzen.Graphics
 import Reactive.Banana.Dzen.Bars (vbar)
+import Reactive.Banana.Dzen.Time
 import qualified Reactive.Banana.Dzen.Bars as B
 
 main :: IO ()
@@ -32,15 +36,19 @@ main = do
   cpuSrc  <- Cpu.newMonitor
   memSrc  <- Mem.newMonitor
   swapSrc <- Swap.newMonitor
-  monitors <- sequence [initMonitor cpuSrc, initMonitor memSrc, initMonitor swapSrc]
+  timeSrc <- Time.newMonitor
+  monitors <- sequence [initMonitor cpuSrc, initMonitor memSrc, initMonitor swapSrc, initMonitor timeSrc]
 
   debugDzen putStrLn conf monitors $ do
     cpu  <- fromMonitorSource cpuSrc
     mem  <- fromMonitorSource memSrc
     swap <- fromMonitorSource swapSrc
+    time <- fromMonitorSource timeSrc
     return $ "CPU " <> costBar (Cpu.busy cpu) <> sep
           <> "Mem " <> costBar (Mem.usedRatio mem) <> spacer 3 <> costBar (Swap.usedRatio swap) <> sep
           <> ypos (-5) (icon "examples/bitmaps/battery.xbm")
+          <> spacer 100
+          <> formatTime defaultTimeLocale "%a %d. %b  %l:%M" time
 
 conf :: DzenConf
 conf = defaultConf { dzenArgs = ["-xs", "1", -- Display only on one monitor
