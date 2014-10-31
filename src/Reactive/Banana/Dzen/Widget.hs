@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Copyright: (c) Guilherme Azzi, 2014
 License: MIT
@@ -26,7 +27,6 @@ import Data.String
 
 import Reactive.Banana
 import Reactive.Banana.Dzen.Internal.Widget
-
 
 instance IsString (Widget t) where
   fromString = label

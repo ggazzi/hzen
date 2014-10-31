@@ -33,9 +33,6 @@ import Reactive.Banana.Sources
 
 import Control.Monad (zipWithM_)
 
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
 import Reactive.Banana

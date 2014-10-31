@@ -17,13 +17,10 @@ import Prelude hiding (readFile)
 import Control.Applicative
 
 import Data.Map (Map)
-import Data.Maybe (mapMaybe)
 import Data.Set (Set)
 import Data.Text (Text)
 
-import qualified Data.Char as C
 import qualified Data.Map as M
-import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -62,8 +59,8 @@ meminfoFile relevant = scanFold (meminfoLine relevant) endOfInput M.empty
 
 -- | Generic parser combinator for reading sequences that accumulate input.
 scanFold :: (Alternative f, Monad f) => (a -> f a) -> f b -> a -> f a
-scanFold toRead terminator seed = scan seed
-  where scan acc = (terminator *> pure acc) <|> (toRead acc >>= scan)
+scanFold toRead terminator = go
+  where go acc = (terminator *> pure acc) <|> (toRead acc >>= go)
 
 -- | Parser for a line of the @/proc/meminfo@ file.
 --
@@ -71,8 +68,7 @@ scanFold toRead terminator seed = scan seed
 -- @FieldName: value [kB]@, where value is a number.
 meminfoLine :: Set Text -> Map Text Int -> Parser (Map Text Int)
 meminfoLine relevant acc = do
-    label <- P.takeWhile notColon
-    char ':'
+    label <- P.takeWhile notColon <* char ':'
     (if label `S.member` relevant
       then M.insert label <$> (skipSpace *> decimal)
       else pure id) <*> pure acc

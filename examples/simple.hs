@@ -10,13 +10,9 @@ module Main(main) where
 
 import Reactive.Banana.Monitors
 
-import Reactive.Banana.Monitors.Cpu (CpuMonitor)
 import qualified Reactive.Banana.Monitors.Cpu as Cpu
-import Reactive.Banana.Monitors.Mem (MemMonitor)
 import qualified Reactive.Banana.Monitors.Mem as Mem
-import Reactive.Banana.Monitors.Swap (SwapMonitor)
 import qualified Reactive.Banana.Monitors.Swap as Swap
-import Reactive.Banana.Monitors.Time (TimeMonitor)
 import qualified Reactive.Banana.Monitors.Time as Time
 
 import qualified Data.Colour.Names as C
